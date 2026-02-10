@@ -1,10 +1,15 @@
+const config = require('../config/env');
 const authService = require('../services/authService');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE
+    const expire = config.jwtExpire || '30d';
+    if (!config.jwtSecret) {
+        console.error('CRITICAL: JWT_SECRET is missing!');
+    }
+    return jwt.sign({ id }, config.jwtSecret, {
+        expiresIn: expire
     });
 };
 
