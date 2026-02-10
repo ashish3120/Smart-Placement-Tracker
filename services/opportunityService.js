@@ -2,10 +2,15 @@ const Opportunity = require('../models/Opportunity');
 const ApiError = require('../utils/ApiError');
 
 const createOpportunity = async (data, user) => {
+    console.log('Creating opportunity:', JSON.stringify(data));
+    console.log('User context:', user ? user._id : 'missing');
+
     const opportunity = await Opportunity.create({
         ...data,
         created_by: user._id
     });
+
+    console.log('Opportunity created:', opportunity._id);
     return opportunity;
 };
 
