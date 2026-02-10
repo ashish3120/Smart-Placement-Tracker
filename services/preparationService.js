@@ -32,6 +32,25 @@ const getPreparation = async (userId, opportunityId) => {
     return preparation;
 };
 
+const getAllUserPreparations = async (userId) => {
+    const allOpportunities = await Opportunity.find();
+
+    const prepList = [];
+    for (const opp of allOpportunities) {
+        const prep = await getPreparation(userId, opp._id);
+        prepList.push({
+            ...prep,
+            opportunity_id: {
+                _id: opp._id,
+                company_name: opp.company_name,
+                role: opp.role
+            }
+        });
+    }
+
+    return prepList;
+};
+
 const updatePreparation = async (userId, opportunityId, data) => {
     // JsonDB needs ID to update usually, or we find then update
     // Preparation model has findOneAndUpdate wrapper now
@@ -50,5 +69,6 @@ const updatePreparation = async (userId, opportunityId, data) => {
 
 module.exports = {
     getPreparation,
+    getAllUserPreparations,
     updatePreparation
 };

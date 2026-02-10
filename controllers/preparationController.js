@@ -1,5 +1,17 @@
 const preparationService = require('../services/preparationService');
 
+// @desc    Get all preparations for current user
+// @route   GET /api/preparation
+// @access  Private
+const getPreparations = async (req, res, next) => {
+    try {
+        const preparations = await preparationService.getAllUserPreparations(req.user._id);
+        res.status(200).json({ success: true, count: preparations.length, data: preparations });
+    } catch (err) {
+        next(err);
+    }
+};
+
 // @desc    Get preparation for an opportunity
 // @route   GET /api/preparation/:opportunity_id
 // @access  Private
@@ -25,6 +37,7 @@ const updatePreparation = async (req, res, next) => {
 };
 
 module.exports = {
+    getPreparations,
     getPreparation,
     updatePreparation
 };

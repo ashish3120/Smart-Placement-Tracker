@@ -18,40 +18,17 @@ const PreparationHub = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch applications to find active ones
-        const appRes = await api.get('/applications');
-        const applications = appRes.data.data.filter((a: any) =>
-          ['Applied', 'Interview', 'Selected'].includes(a.status)
-        );
-
-        const prepList = [];
-        for (const app of applications) {
-          const oppId = app.opportunity_id._id || app.opportunity_id;
-          // Fetch prep for each
-          try {
-            const prepRes = await api.get(`/preparation/${oppId}`);
-            if (prepRes.data.data) {
-              const p = prepRes.data.data;
-              // Populate company name if possible, or we rely on app.opportunity_id populated
-              // My Application service populates opportunity_id
-              const companyName = app.opportunity_id.company_name || 'Unknown Company';
-              const role = app.opportunity_id.role || 'Role';
-
-              prepList.push({
-                id: p._id,
-                company: companyName,
-                role: role,
-                checklist: p.checklist_items
-              });
-            }
-          } catch (e) {
-            console.error("Failed to fetch prep for opp", oppId);
-          }
-        }
-        setCompanyPrep(prepList);
-
+        const prepRes = await api.get('/preparation');
+        const list = prepRes.data.data.map((p: any) => ({
+          id: p._id,
+          oppId: p.opportunity_id._id,
+          company: p.opportunity_id.company_name,
+          role: p.opportunity_id.role,
+          checklist: p.checklist_items
+        }));
+        setCompanyPrep(list);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch preparations:", error);
       } finally {
         setLoading(false);
       }
@@ -65,6 +42,23 @@ const PreparationHub = () => {
   const toggleGlobalItem = (id: string) => {
     setGlobalChecklist((prev) =>
       prev.map((c) => (c.id === id ? { ...c, completed: !c.completed } : c))
+    );
+  };
+
+  const toggleChecklist = (prepId: string, oppId: string, idx: number, checked: boolean) => {
+    setCompanyPrep((prev) =>
+      prev.map((p) => {
+        if (p.id !== prepId) return p;
+        const newItems = [...p.checklist];
+        newItems[idx].completed = checked;
+
+        // Auto save
+        api.put(`/preparation/${oppId}`, {
+          checklist_items: newItems,
+        }).catch(err => console.error(err));
+
+        return { ...p, checklist: newItems };
+      })
     );
   };
 
@@ -150,8 +144,12 @@ const PreparationHub = () => {
                     <div className="space-y-1">
                       {prepItems.map((item: any, idx: number) => (
                         <div key={idx} className="flex items-center gap-2">
-                          <div className={`h-2 w-2 rounded-full ${item.completed ? 'bg-status-success' : 'bg-muted'}`} />
-                          <span className={`text-xs ${item.completed ? 'text-muted-foreground' : ''}`}>{item.title}</span>
+                          <Checkbox
+                            checked={item.completed}
+                            onCheckedChange={(checked) => toggleChecklist(o.id, o.oppId, idx, !!checked)}
+                            className="h-4 w-4"
+                          />
+                          <span className={`text-xs ${item.completed ? 'text-muted-foreground line-through' : ''}`}>{item.title}</span>
                         </div>
                       ))}
                     </div>

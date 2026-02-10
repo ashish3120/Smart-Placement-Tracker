@@ -9,6 +9,9 @@ const router = express.Router();
 
 router.use(protect);
 
+router.route('/')
+    .get(getPreparations);
+
 router.route('/:opportunity_id')
     .get(getPreparation)
     .put(updatePreparation);
