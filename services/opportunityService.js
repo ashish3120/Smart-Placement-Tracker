@@ -16,7 +16,8 @@ const createOpportunity = async (data, user) => {
 
 const getOpportunities = async (query) => {
     // Advanced filtering could be added here
-    const opportunities = await Opportunity.find(query).sort({ createdAt: -1 });
+    // Opportunity.find already sorts by createdAt: -1 in JsonDB
+    const opportunities = await Opportunity.find(query);
     return opportunities;
 };
 
