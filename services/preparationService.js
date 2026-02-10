@@ -33,21 +33,29 @@ const getPreparation = async (userId, opportunityId) => {
 };
 
 const getAllUserPreparations = async (userId) => {
+    console.log('[PrepService] Fetching all for user:', userId);
     const allOpportunities = await Opportunity.find();
+    console.log(`[PrepService] Found ${allOpportunities.length} opportunities in total.`);
 
     const prepList = [];
     for (const opp of allOpportunities) {
-        const prep = await getPreparation(userId, opp._id);
-        prepList.push({
-            ...prep,
-            opportunity_id: {
-                _id: opp._id,
-                company_name: opp.company_name,
-                role: opp.role
-            }
-        });
+        console.log(`[PrepService] Reconciling ${opp.company_name} (${opp._id})`);
+        try {
+            const prep = await getPreparation(userId, opp._id);
+            prepList.push({
+                ...prep,
+                opportunity_id: {
+                    _id: opp._id,
+                    company_name: opp.company_name,
+                    role: opp.role
+                }
+            });
+        } catch (err) {
+            console.error(`[PrepService] Error for opp ${opp._id}:`, err.message);
+        }
     }
 
+    console.log(`[PrepService] Sync complete. Returning ${prepList.length} items.`);
     return prepList;
 };
 

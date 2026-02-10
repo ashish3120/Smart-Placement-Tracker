@@ -5,9 +5,12 @@ const preparationService = require('../services/preparationService');
 // @access  Private
 const getPreparations = async (req, res, next) => {
     try {
+        console.log(`[PrepController] Bulk fetch triggered by ${req.user?._id}`);
         const preparations = await preparationService.getAllUserPreparations(req.user._id);
+        console.log(`[PrepController] Successfully reconciled ${preparations.length} records.`);
         res.status(200).json({ success: true, count: preparations.length, data: preparations });
     } catch (err) {
+        console.error(`[PrepController] Bulk sync failure:`, err.message);
         next(err);
     }
 };

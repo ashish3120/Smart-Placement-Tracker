@@ -18,17 +18,27 @@ const PreparationHub = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("[PrepHub] Fetching sync data...");
         const prepRes = await api.get('/preparation');
+        console.log("[PrepHub] API Data received:", prepRes.data);
+
+        if (!prepRes.data || !prepRes.data.data) {
+          console.warn("[PrepHub] No data found in response");
+          return;
+        }
+
         const list = prepRes.data.data.map((p: any) => ({
           id: p._id,
-          oppId: p.opportunity_id._id,
-          company: p.opportunity_id.company_name,
-          role: p.opportunity_id.role,
-          checklist: p.checklist_items
+          oppId: p.opportunity_id?._id || p.opportunity_id, // Fallback if not populated
+          company: p.opportunity_id?.company_name || 'Unknown Company',
+          role: p.opportunity_id?.role || 'SDE',
+          checklist: p.checklist_items || []
         }));
+
+        console.log("[PrepHub] Processed list:", list);
         setCompanyPrep(list);
-      } catch (error) {
-        console.error("Failed to fetch preparations:", error);
+      } catch (error: any) {
+        console.error("Failed to fetch preparations:", error.response?.status, error.message);
       } finally {
         setLoading(false);
       }
