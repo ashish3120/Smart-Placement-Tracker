@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+    getPreparations,
     getPreparation,
     updatePreparation
 } = require('../controllers/preparationController');
