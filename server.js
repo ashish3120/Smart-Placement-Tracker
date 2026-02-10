@@ -29,6 +29,14 @@ const opportunities = require('./routes/opportunities');
 const applications = require('./routes/applications');
 const preparation = require('./routes/preparation');
 
+app.get('/', (req, res) => {
+    res.json({ success: true, message: 'Smart Placement Tracker API is running' });
+});
+
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 app.use('/api/auth', auth);
 app.use('/api/dashboard', dashboard);
 app.use('/api/opportunities', opportunities);
