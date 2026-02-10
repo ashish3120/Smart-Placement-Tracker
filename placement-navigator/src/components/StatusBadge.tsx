@@ -11,7 +11,7 @@ const statusConfig: Record<Status, { bg: string; dot: string }> = {
 };
 
 export function StatusBadge({ status }: { status: Status }) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig["Not Applied"];
   return (
     <span
       className={cn(
