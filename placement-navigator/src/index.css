@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 16% 96%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 220 70% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 20% 20%;
+
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 220 60% 96%;
+    --accent-foreground: 220 70% 50%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 89%;
+    --ring: 220 70% 50%;
+
+    --radius: 0.75rem;
+
+    /* Status colors */
+    --status-urgent: 0 84% 60%;
+    --status-warning: 38 92% 50%;
+    --status-success: 152 60% 42%;
+    --status-info: 220 70% 50%;
+    --status-neutral: 220 10% 46%;
+
+    /* Sidebar */
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 220 14% 65%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 220 20% 16%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 220 16% 16%;
+    --sidebar-ring: 220 70% 50%;
+
+    /* Shadows */
+    --shadow-card: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.03);
+    --shadow-card-hover: 0 4px 12px -2px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.04);
+    --shadow-elevated: 0 8px 24px -4px rgba(0,0,0,0.1), 0 4px 8px -4px rgba(0,0,0,0.04);
+  }
+
+  .dark {
+    --background: 220 20% 7%;
+    --foreground: 220 14% 90%;
+    --card: 220 20% 10%;
+    --card-foreground: 220 14% 90%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 14% 90%;
+    --primary: 220 70% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 16% 16%;
+    --secondary-foreground: 220 14% 90%;
+    --muted: 220 16% 14%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 220 16% 16%;
+    --accent-foreground: 220 14% 90%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 16% 18%;
+    --input: 220 16% 18%;
+    --ring: 220 70% 55%;
+    --sidebar-background: 220 20% 5%;
+    --sidebar-foreground: 220 14% 55%;
+    --sidebar-primary: 220 14% 90%;
+    --sidebar-primary-foreground: 220 20% 5%;
+    --sidebar-accent: 220 16% 12%;
+    --sidebar-accent-foreground: 220 14% 90%;
+    --sidebar-border: 220 16% 14%;
+    --sidebar-ring: 220 70% 55%;
+    --shadow-card: 0 1px 3px 0 rgba(0,0,0,0.2);
+    --shadow-card-hover: 0 4px 12px -2px rgba(0,0,0,0.3);
+    --shadow-elevated: 0 8px 24px -4px rgba(0,0,0,0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .card-elevated {
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .card-elevated:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+  .card-interactive {
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .card-interactive:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+  }
+}
+
+@layer utilities {
+  .status-urgent {
+    @apply text-[hsl(var(--status-urgent))];
+  }
+  .status-warning {
+    @apply text-[hsl(var(--status-warning))];
+  }
+  .status-success {
+    @apply text-[hsl(var(--status-success))];
+  }
+  .status-info {
+    @apply text-[hsl(var(--status-info))];
+  }
+  .bg-status-urgent {
+    @apply bg-[hsl(var(--status-urgent)/0.1)] text-[hsl(var(--status-urgent))];
+  }
+  .bg-status-warning {
+    @apply bg-[hsl(var(--status-warning)/0.1)] text-[hsl(var(--status-warning))];
+  }
+  .bg-status-success {
+    @apply bg-[hsl(var(--status-success)/0.1)] text-[hsl(var(--status-success))];
+  }
+  .bg-status-info {
+    @apply bg-[hsl(var(--status-info)/0.1)] text-[hsl(var(--status-info))];
+  }
+}
