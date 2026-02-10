@@ -10,19 +10,33 @@ class JsonDB {
     }
 
     load() {
-        if (!fs.existsSync(path.join(__dirname, '..', 'data'))) {
-            fs.mkdirSync(path.join(__dirname, '..', 'data'));
+        const dataDir = path.join(__dirname, '..', 'data');
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
         }
         if (fs.existsSync(this.filePath)) {
-            const content = fs.readFileSync(this.filePath, 'utf-8');
-            this.data = content ? JSON.parse(content) : [];
+            try {
+                const content = fs.readFileSync(this.filePath, 'utf-8');
+                this.data = content ? JSON.parse(content) : [];
+            } catch (err) {
+                console.error(`Error loading ${this.filename}:`, err);
+                this.data = [];
+            }
         } else {
             this.save();
         }
     }
 
     save() {
-        fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2));
+        try {
+            const dataDir = path.join(__dirname, '..', 'data');
+            if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir, { recursive: true });
+            }
+            fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2));
+        } catch (err) {
+            console.error(`Error saving ${this.filename}:`, err);
+        }
     }
 
     async create(item) {

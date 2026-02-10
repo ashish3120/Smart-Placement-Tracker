@@ -4,11 +4,10 @@ const jwt = require('jsonwebtoken');
 
 // Generate JWT
 const generateToken = (id) => {
-    const expire = config.jwtExpire || '30d';
-    if (!config.jwtSecret) {
-        console.error('CRITICAL: JWT_SECRET is missing!');
-    }
-    return jwt.sign({ id }, config.jwtSecret, {
+    const secret = config.jwtSecret || 'temporary_hackathon_secret_123';
+    const expire = '30d';
+
+    return jwt.sign({ id }, secret, {
         expiresIn: expire
     });
 };
