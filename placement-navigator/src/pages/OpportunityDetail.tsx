@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, IndianRupee, Calendar, GraduationCap, Building2, Check } from "lucide-react";
+import { ArrowLeft, IndianRupee, Calendar, GraduationCap, Building2, Check, Save } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -308,17 +308,6 @@ const OpportunityDetail = () => {
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold">Notes</h3>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 rounded-lg text-xs"
-              onClick={async () => {
-                await savePreparation();
-                toast.success("Preparation details saved!");
-              }}
-            >
-              Save All Progress
-            </Button>
           </div>
           <Textarea
             value={notes}
@@ -329,6 +318,21 @@ const OpportunityDetail = () => {
           />
         </CardContent>
       </Card>
+
+      {/* Save Action */}
+      <div className="flex justify-end pb-8">
+        <Button
+          size="lg"
+          className="rounded-xl px-8 gap-2 bg-[hsl(var(--primary))] hover:opacity-90 shadow-lg shadow-[hsl(var(--primary)/0.2)]"
+          onClick={async () => {
+            await savePreparation();
+            toast.success("Preparation details saved!");
+          }}
+        >
+          <Save className="h-4 w-4" />
+          Save All Progress
+        </Button>
+      </div>
     </div>
   );
 };
