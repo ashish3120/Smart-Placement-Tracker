@@ -45,7 +45,16 @@ const login = async (email, password) => {
     return user;
 };
 
+const updateUser = async (userId, data) => {
+    const user = await User.findByIdAndUpdate(userId, data);
+    if (!user) {
+        throw new ApiError('User not found', 404);
+    }
+    return user;
+};
+
 module.exports = {
     register,
-    login
+    login,
+    updateUser
 };

@@ -22,6 +22,10 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+// Set static folder
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 const auth = require('./routes/auth');
 const dashboard = require('./routes/dashboard');

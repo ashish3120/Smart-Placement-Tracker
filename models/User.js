@@ -44,9 +44,8 @@ class User {
         return user;
     }
 
-    // Auth middleware uses this
-    static async findById(id) {
-        return await userDB.findById(id);
+    static async findByIdAndUpdate(id, data) {
+        return await userDB.findByIdAndUpdate(id, data);
     }
 
     static async deleteMany() {

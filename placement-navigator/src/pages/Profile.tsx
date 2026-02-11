@@ -7,10 +7,13 @@ import { Switch } from "@/components/ui/switch";
 import { Upload, User, Bell, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import api from "../lib/api";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const u = localStorage.getItem('user');
@@ -26,6 +29,39 @@ const Profile = () => {
     localStorage.removeItem('user');
     toast.success("Logged out");
     navigate('/login');
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    try {
+      setUploading(true);
+      const res = await api.post('/auth/upload-resume', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res.data.success) {
+        toast.success("Resume uploaded successfully!");
+        const updatedUser = { ...user, resume_path: res.data.filePath };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to upload resume");
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (!user) return null;
@@ -89,14 +125,52 @@ const Profile = () => {
             </div>
             <h2 className="text-sm font-semibold">Resume</h2>
           </div>
-          <div className="border-2 border-dashed rounded-2xl p-10 text-center hover:border-[hsl(var(--primary)/0.4)] hover:bg-accent/50 transition-colors cursor-pointer">
-            <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3">
-              <Upload className="h-5 w-5 text-muted-foreground" />
+
+          <div className="space-y-4">
+            {user.resume_path && (
+              <div className="flex items-center justify-between p-4 bg-accent/30 rounded-2xl border border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-status-info/10 flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-[hsl(var(--status-info))]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Current Resume</p>
+                    <a
+                      href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.resume_path}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[hsl(var(--primary))] hover:underline"
+                    >
+                      View uploaded PDF
+                    </a>
+                  </div>
+                </div>
+                <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider bg-background px-2 py-1 rounded-md border">
+                  PDF
+                </div>
+              </div>
+            )}
+
+            <div
+              className="border-2 border-dashed rounded-2xl p-10 text-center hover:border-[hsl(var(--primary)/0.4)] hover:bg-accent/50 transition-colors cursor-pointer relative group"
+              onClick={() => document.getElementById('resume-upload')?.click()}
+            >
+              <input
+                id="resume-upload"
+                type="file"
+                className="hidden"
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileUpload}
+                disabled={uploading}
+              />
+              <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3 group-hover:bg-[hsl(var(--primary)/0.1)] transition-colors">
+                <Upload className={`h-5 w-5 ${uploading ? 'animate-bounce' : 'text-muted-foreground group-hover:text-[hsl(var(--primary))]'}`} />
+              </div>
+              <p className="text-sm">
+                {uploading ? "Uploading..." : user.resume_path ? "Replace your resume, or browse" : "Drag & drop your resume, or browse"}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1.5">PDF, DOC up to 5MB</p>
             </div>
-            <p className="text-sm">
-              Drag & drop your resume, or <span className="text-[hsl(var(--primary))] font-semibold cursor-pointer">browse</span>
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-1.5">PDF, DOC up to 5MB</p>
           </div>
         </CardContent>
       </Card>
