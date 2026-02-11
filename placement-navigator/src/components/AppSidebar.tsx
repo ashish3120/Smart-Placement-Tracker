@@ -39,7 +39,7 @@ export function AppSidebar() {
       if (u) {
         setUser(JSON.parse(u));
       } else {
-        setUser({ name: "Rahul Sharma", branch: "CS", cgpa: "8.2" });
+        setUser({ name: "Student", branch: "", cgpa: "" });
       }
     };
 
@@ -110,12 +110,12 @@ export function AppSidebar() {
       <SidebarFooter className="p-4">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/40">
           <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-semibold text-sidebar-accent-foreground">
-            {user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'RS'}
+            {user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) || 'ST'}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-sidebar-accent-foreground truncate">{user?.name || 'Rahul Sharma'}</p>
+            <p className="text-xs font-medium text-sidebar-accent-foreground truncate">{user?.name || 'Student'}</p>
             <p className="text-[11px] text-sidebar-foreground truncate">
-              {user?.branch || 'CS'} · {user?.cgpa || '8.2'} CGPA
+              {user?.branch || 'Branch N/A'} · {user?.cgpa || 'N/A'} CGPA
             </p>
           </div>
         </div>

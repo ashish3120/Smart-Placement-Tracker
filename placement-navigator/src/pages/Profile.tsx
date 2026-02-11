@@ -15,9 +15,9 @@ const Profile = () => {
 
   const [uploading, setUploading] = useState(false);
   const [profileData, setProfileData] = useState({
-    roll_number: "21CS1045",
-    branch: "Computer Science",
-    cgpa: "8.2"
+    roll_number: "",
+    branch: "",
+    cgpa: ""
   });
 
   useEffect(() => {
@@ -26,9 +26,9 @@ const Profile = () => {
       const parsed = JSON.parse(u);
       setUser(parsed);
       setProfileData({
-        roll_number: parsed.roll_number || "21CS1045",
-        branch: parsed.branch || "Computer Science",
-        cgpa: parsed.cgpa || "8.2"
+        roll_number: parsed.roll_number || "",
+        branch: parsed.branch || "",
+        cgpa: parsed.cgpa || ""
       });
     } else {
       navigate('/login');
