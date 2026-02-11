@@ -2,6 +2,9 @@
 
 A comprehensive, production-ready web application designed to help students effortlessly track campus placement opportunities, manage critical deadlines, and streamline interview preparation.
 
+## 🌐 Live Demo
+Check out the live application here: [Smart Placement Tracker](https://smart-placement-tracker-silk.vercel.app/)
+
 ---
 
 ## ✨ Features
