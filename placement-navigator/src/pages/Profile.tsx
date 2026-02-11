@@ -14,11 +14,22 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const [uploading, setUploading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    roll_number: "21CS1045",
+    branch: "Computer Science",
+    cgpa: "8.2"
+  });
 
   useEffect(() => {
     const u = localStorage.getItem('user');
     if (u) {
-      setUser(JSON.parse(u));
+      const parsed = JSON.parse(u);
+      setUser(parsed);
+      setProfileData({
+        roll_number: parsed.roll_number || "21CS1045",
+        branch: parsed.branch || "Computer Science",
+        cgpa: parsed.cgpa || "8.2"
+      });
     } else {
       navigate('/login');
     }
@@ -45,22 +56,34 @@ const Profile = () => {
 
     try {
       setUploading(true);
-      const res = await api.post('/auth/upload-resume', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await api.post('/auth/upload-resume', formData);
 
       if (res.data.success) {
-        toast.success("Resume uploaded successfully!");
         const updatedUser = { ...user, resume_path: res.data.filePath };
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event('user-updated'));
+        toast.success("Resume uploaded successfully!");
       }
     } catch (error: any) {
+      console.error("Upload error:", error);
       toast.error(error.response?.data?.error || "Failed to upload resume");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const updatedUser = { ...user, ...profileData };
+      // Save to local storage
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      // Notify sidebar
+      window.dispatchEvent(new Event('user-updated'));
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile");
     }
   };
 
@@ -93,24 +116,36 @@ const Profile = () => {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground">Roll Number</Label>
-                <Input defaultValue="21CS1045" className="h-9 rounded-xl" />
+                <Input
+                  value={profileData.roll_number}
+                  onChange={e => setProfileData({ ...profileData, roll_number: e.target.value })}
+                  className="h-9 rounded-xl"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground">Branch</Label>
-                <Input defaultValue="Computer Science" className="h-9 rounded-xl" />
+                <Input
+                  value={profileData.branch}
+                  onChange={e => setProfileData({ ...profileData, branch: e.target.value })}
+                  className="h-9 rounded-xl"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground">CGPA</Label>
-                <Input defaultValue="8.2" className="h-9 rounded-xl" />
+                <Input
+                  value={profileData.cgpa}
+                  onChange={e => setProfileData({ ...profileData, cgpa: e.target.value })}
+                  className="h-9 rounded-xl"
+                />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground">Email</Label>
               <Input defaultValue={user.email} type="email" className="h-9 rounded-xl" readOnly />
             </div>
-            <Button size="sm" className="rounded-xl h-9 px-5">Save Changes</Button>
+            <Button size="sm" className="rounded-xl h-9 px-5" onClick={handleSave}>Save Changes</Button>
             <p className="text-[11px] text-muted-foreground">Note: Name and Email updates are disabled in this demo.</p>
           </div>
         </CardContent>

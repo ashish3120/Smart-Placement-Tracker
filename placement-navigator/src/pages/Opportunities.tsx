@@ -63,15 +63,14 @@ const Opportunities = () => {
       const applications = appRes.data.data;
       const appMap: Record<string, string> = {};
       applications.forEach((a: any) => {
-        // applications has opportunity_id as object (populated) or string? 
-        // My service populates it.
-        const oppId = a.opportunity_id._id || a.opportunity_id;
+        if (!a.opportunity_id) return;
+        const oppId = String(a.opportunity_id._id || a.opportunity_id);
         appMap[oppId] = a.status;
       });
 
       const finalData = mapped.map((o: Opportunity) => ({
         ...o,
-        status: appMap[o.id] || 'Not Applied'
+        status: appMap[String(o.id)] || 'Not Applied'
       }));
 
       setData(finalData);
@@ -96,6 +95,16 @@ const Opportunities = () => {
       fetchOpportunities(); // Refresh
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to add opportunity");
+    }
+  };
+
+  const handleApply = async (oppId: string) => {
+    try {
+      await api.post('/applications', { opportunity_id: oppId });
+      toast.success("Applied successfully!");
+      fetchOpportunities(); // Refresh the list
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to apply");
     }
   };
 
@@ -263,7 +272,22 @@ const Opportunities = () => {
                       <p className="text-xs text-muted-foreground">{o.role}</p>
                     </div>
                   </div>
-                  <StatusBadge status={o.status} />
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={o.status} />
+                    {o.status === "Not Applied" && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="h-7 rounded-lg text-[11px] px-3 font-semibold"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleApply(o.id);
+                        }}
+                      >
+                        Quick Apply
+                      </Button>
+                    )}
+                  </div>
                   <span className="text-sm font-medium">{o.ctc}</span>
                   <div className="text-right">
                     <DeadlineIndicator deadline={o.deadline} />

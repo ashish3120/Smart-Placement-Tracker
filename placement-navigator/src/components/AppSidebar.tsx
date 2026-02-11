@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Briefcase,
@@ -30,6 +31,27 @@ const navItems = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const u = localStorage.getItem('user');
+      if (u) {
+        setUser(JSON.parse(u));
+      } else {
+        setUser({ name: "Rahul Sharma", branch: "CS", cgpa: "8.2" });
+      }
+    };
+
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('user-updated', handleUpdate);
+    handleUpdate();
+
+    return () => {
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('user-updated', handleUpdate);
+    };
+  }, []);
 
   return (
     <Sidebar className="border-r-0">
@@ -67,11 +89,10 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         end={item.url === "/"}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-150 ${
-                          isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-sm"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                        }`}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-150 ${isActive
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-sm"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                          }`}
                         activeClassName=""
                       >
                         <item.icon className="h-[18px] w-[18px]" strokeWidth={isActive ? 2 : 1.5} />
@@ -89,11 +110,13 @@ export function AppSidebar() {
       <SidebarFooter className="p-4">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/40">
           <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-semibold text-sidebar-accent-foreground">
-            RS
+            {user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'RS'}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-sidebar-accent-foreground truncate">Rahul Sharma</p>
-            <p className="text-[11px] text-sidebar-foreground truncate">CS · 8.2 CGPA</p>
+            <p className="text-xs font-medium text-sidebar-accent-foreground truncate">{user?.name || 'Rahul Sharma'}</p>
+            <p className="text-[11px] text-sidebar-foreground truncate">
+              {user?.branch || 'CS'} · {user?.cgpa || '8.2'} CGPA
+            </p>
           </div>
         </div>
       </SidebarFooter>

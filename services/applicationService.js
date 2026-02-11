@@ -23,24 +23,33 @@ const createApplication = async (userId, opportunityId) => {
     }
 
     // 3. Create Application
+    console.log(`[AppService] Creating application for user ${userId} and opportunity ${opportunityId}`);
     const application = await Application.create({
         user_id: userId,
         opportunity_id: opportunityId,
-        status: 'Applied'
+        status: 'Applied',
+        last_updated: new Date()
     });
 
     return application;
 };
 
 const getApplications = async (query) => {
+    console.log('[AppService] Getting applications for query:', JSON.stringify(query));
     const allApps = await Application.find(query);
+    console.log(`[AppService] Found ${allApps.length} raw applications.`);
 
     // Manual populate
     const populatedApps = await Promise.all(allApps.map(async (app) => {
+        console.log(`[AppService] Populating app ${app._id}, oppId: ${app.opportunity_id}`);
         const opportunity = await Opportunity.findById(app.opportunity_id);
+        if (!opportunity) {
+            console.warn(`[AppService] Opportunity ${app.opportunity_id} NOT FOUND for app ${app._id}`);
+        }
         return {
             ...app,
             opportunity_id: opportunity ? {
+                _id: opportunity._id,
                 company_name: opportunity.company_name,
                 role: opportunity.role,
                 deadline: opportunity.deadline
@@ -48,7 +57,11 @@ const getApplications = async (query) => {
         };
     }));
 
-    return populatedApps.sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated));
+    return populatedApps.sort((a, b) => {
+        const dateA = new Date(a.last_updated || a.createdAt);
+        const dateB = new Date(b.last_updated || b.createdAt);
+        return dateB.getTime() - dateA.getTime();
+    });
 };
 
 const updateApplicationStatus = async (id, status, interviewDate) => {

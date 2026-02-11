@@ -30,7 +30,7 @@ function checkFileType(file, cb) {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb('Error: Resumes Only (PDF, DOC, DOCX)!');
+        cb(new Error('Error: Resumes Only (PDF, DOC, DOCX)!'));
     }
 }
 

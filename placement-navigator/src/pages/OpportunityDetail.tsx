@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,8 +54,9 @@ const OpportunityDetail = () => {
         const myApps = appRes.data.data;
         // Handle both populated object and string ID
         const myApp = myApps.find((a: any) => {
-          const aOppId = a.opportunity_id._id || a.opportunity_id;
-          return aOppId === id;
+          if (!a.opportunity_id) return false;
+          const aOppId = String(a.opportunity_id._id || a.opportunity_id);
+          return aOppId === String(id);
         });
 
         if (myApp) {
@@ -185,7 +187,18 @@ const OpportunityDetail = () => {
             <p className="text-sm text-muted-foreground mt-0.5">{opp.role}</p>
           </div>
         </div>
-        <StatusBadge status={status as any} />
+        <div className="flex flex-col items-end gap-2">
+          <StatusBadge status={status as any} />
+          {status === "Not Applied" && !isPast && (
+            <Button
+              onClick={() => handleStatusChange("Applied")}
+              size="sm"
+              className="rounded-xl px-6 h-9 bg-[hsl(var(--primary))] hover:opacity-90 transition-opacity"
+            >
+              Apply Now
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Overview Grid */}
@@ -219,10 +232,10 @@ const OpportunityDetail = () => {
                   <div className="flex flex-col items-center gap-1.5">
                     <div
                       className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${status === "Rejected"
-                          ? "bg-muted text-muted-foreground"
-                          : isCompleted
-                            ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-md"
-                            : "bg-muted text-muted-foreground"
+                        ? "bg-muted text-muted-foreground"
+                        : isCompleted
+                          ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-md"
+                          : "bg-muted text-muted-foreground"
                         }`}
                     >
                       {isCompleted ? <Check className="h-4 w-4" /> : i + 1}
@@ -282,7 +295,6 @@ const OpportunityDetail = () => {
                   <span className={`text-sm font-medium block ${item.completed ? "line-through text-muted-foreground" : ""}`}>
                     {item.title}
                   </span>
-                  {/* <span className="text-[11px] text-muted-foreground">{item.desc}</span> // Backend doesn't have desc yet, can add if needed */}
                 </div>
               </label>
             ))}
@@ -294,7 +306,20 @@ const OpportunityDetail = () => {
       {/* Notes */}
       <Card className="border-0 card-elevated">
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold mb-3">Notes</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold">Notes</h3>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 rounded-lg text-xs"
+              onClick={async () => {
+                await savePreparation();
+                toast.success("Preparation details saved!");
+              }}
+            >
+              Save All Progress
+            </Button>
+          </div>
           <Textarea
             value={notes}
             onChange={(e) => handleNoteChange(e.target.value)}

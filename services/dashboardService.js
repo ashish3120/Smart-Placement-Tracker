@@ -21,14 +21,17 @@ const getSummary = async (userId) => {
 
     const stats = {
         applied: 0,
-        interview: 0,
+        interviews: 0,
         selected: 0,
         rejected: 0
     };
 
     applications.forEach(app => {
-        if (stats.hasOwnProperty(app.status.toLowerCase())) {
-            stats[app.status.toLowerCase()]++;
+        const s = app.status.toLowerCase();
+        if (s === 'interview') {
+            stats.interviews++;
+        } else if (stats.hasOwnProperty(s)) {
+            stats[s]++;
         }
     });
 
@@ -72,6 +75,7 @@ const getToday = async (userId) => {
             interviewsToday.push({
                 ...app,
                 opportunity_id: {
+                    _id: opportunity ? opportunity._id : null,
                     company_name: opportunity ? opportunity.company_name : 'Unknown',
                     role: opportunity ? opportunity.role : 'Unknown'
                 }
