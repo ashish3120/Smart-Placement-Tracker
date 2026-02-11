@@ -14,22 +14,25 @@ const protect = async (req, res, next) => {
     }
 
     if (!token) {
+        console.warn('[Auth] No token provided in header');
         return next(new ApiError('Not authorized to access this route', 401));
     }
 
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
+        console.log(`[Auth] Token verified for ID: ${decoded.id}`);
+
         const user = await User.findById(decoded.id);
 
         if (!user) {
-            console.warn(`Auth failed: User ${decoded.id} not found in DB (possibly reset)`);
+            console.warn(`[Auth] User ${decoded.id} not found in DB`);
             return next(new ApiError('User not found. Please log in again.', 401));
         }
 
         req.user = user;
         next();
     } catch (err) {
-        console.error('Auth verification error:', err.message);
+        console.error('[Auth] Verification failed:', err.message);
         return next(new ApiError('Not authorized to access this route', 401));
     }
 };
